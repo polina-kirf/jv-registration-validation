@@ -26,8 +26,8 @@ class RegistrationServiceImplTest {
         user.setPassword(null);
         user.setAge(null);
 
-        Assertions.assertThrows(RegistrationException.class, () -> service.register(user));
-        Assertions.assertNull(storageDao.get(String.valueOf(user)));
+        Assertions.assertThrows(RegistrationException.class, () -> service.register(null));
+        Assertions.assertNull(storageDao.get(user.getLogin()));
     }
 
     @Test
@@ -47,7 +47,7 @@ class RegistrationServiceImplTest {
         user.setPassword(null);
 
         Assertions.assertThrows(RegistrationException.class, () -> service.register(user));
-        Assertions.assertNull(storageDao.get(user.getPassword()));
+        Assertions.assertNull(storageDao.get(user.getLogin()));
     }
 
     @Test
@@ -57,7 +57,7 @@ class RegistrationServiceImplTest {
         user.setAge(null);
 
         Assertions.assertThrows(RegistrationException.class, () -> service.register(user));
-        Assertions.assertNull(storageDao.get(String.valueOf(user.getAge())));
+        Assertions.assertNull(storageDao.get(user.getLogin()));
     }
 
     @Test
@@ -114,7 +114,7 @@ class RegistrationServiceImplTest {
         user.setPassword("pass3");
 
         Assertions.assertThrows(RegistrationException.class, () -> service.register(user));
-        Assertions.assertNull(storageDao.get(user.getPassword()));
+        Assertions.assertNull(storageDao.get(user.getLogin()));
     }
 
     @Test
@@ -124,7 +124,29 @@ class RegistrationServiceImplTest {
         user.setAge(15);
 
         Assertions.assertThrows(RegistrationException.class, () -> service.register(user));
-        Assertions.assertNull(storageDao.get(String.valueOf(user.getAge())));
+        Assertions.assertNull(storageDao.get(user.getLogin()));
+    }
+
+    @Test
+    void register_negativeAge_notOk() {
+        User user = new User();
+
+        user.setAge(-3);
+
+        Assertions.assertThrows(RegistrationException.class, () -> service.register(user));
+        Assertions.assertNull(storageDao.get(user.getLogin()));
+    }
+
+    @Test
+    void register_shouldPass_whenAgeIsExactly18() {
+        User user = new User();
+
+        user.setLogin("login345");
+        user.setPassword("passWorD567");
+        user.setAge(18);
+
+        Assertions.assertDoesNotThrow(() -> service.register(user));
+        Assertions.assertNotNull(user.getLogin());
     }
 
     @Test
