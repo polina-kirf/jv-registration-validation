@@ -20,14 +20,8 @@ class RegistrationServiceImplTest {
 
     @Test
     void register_nullUser_notOk() {
-        User user = new User();
-
-        user.setLogin(null);
-        user.setPassword(null);
-        user.setAge(null);
-
         Assertions.assertThrows(RegistrationException.class, () -> service.register(null));
-        Assertions.assertNull(storageDao.get(user.getLogin()));
+        Assertions.assertNull(storageDao.get("anyLogin"));
     }
 
     @Test
@@ -108,10 +102,98 @@ class RegistrationServiceImplTest {
     }
 
     @Test
+    void register_loginLengthIsMin_Ok() {
+        User user = new User();
+
+        user.setLogin("login2");
+        user.setPassword("pass12");
+        user.setAge(27);
+
+        Assertions.assertDoesNotThrow(() -> service.register(user));
+        Assertions.assertNotNull(storageDao.get(user.getLogin()));
+    }
+
+    @Test
+    void register_passwordLengthIsMin_Ok() {
+        User user = new User();
+
+        user.setLogin("log345");
+        user.setPassword("passW4");
+        user.setAge(45);
+
+        Assertions.assertDoesNotThrow(() -> service.register(user));
+        Assertions.assertNotNull(storageDao.get(user.getLogin()));
+    }
+
+    @Test
     void register_shortPassword_notOk() {
         User user = new User();
 
         user.setPassword("pass3");
+
+        Assertions.assertThrows(RegistrationException.class, () -> service.register(user));
+        Assertions.assertNull(storageDao.get(user.getLogin()));
+    }
+
+    @Test
+    void register_passwordLengthIs0_notOk() {
+        User user = new User();
+
+        user.setPassword("");
+
+        Assertions.assertThrows(RegistrationException.class, () -> service.register(user));
+        Assertions.assertNull(storageDao.get(user.getLogin()));
+    }
+
+    @Test
+    void register_passwordLengthIs3_notOk() {
+        User user = new User();
+
+        user.setPassword("log");
+
+        Assertions.assertThrows(RegistrationException.class, () -> service.register(user));
+        Assertions.assertNull(storageDao.get(user.getLogin()));
+    }
+
+    @Test
+    void register_passwordLengthIs5_notOk() {
+        User user = new User();
+
+        user.setPassword("login");
+
+        Assertions.assertThrows(RegistrationException.class, () -> service.register(user));
+        Assertions.assertNull(storageDao.get(user.getLogin()));
+    }
+
+    @Test
+    void register_passwordLengthIs6_Ok() {
+        User user = new User();
+
+        user.setLogin("log567");
+        user.setPassword("login1");
+        user.setAge(31);
+
+        Assertions.assertDoesNotThrow(() -> service.register(user));
+        Assertions.assertNotNull(storageDao.get(user.getLogin()));
+    }
+
+    @Test
+    void register_passwordLengthIs8_Ok() {
+        User user = new User();
+
+        user.setLogin("lo678N90");
+        user.setPassword("login156");
+        user.setAge(23);
+
+        Assertions.assertDoesNotThrow(() -> service.register(user));
+        Assertions.assertNotNull(storageDao.get(user.getLogin()));
+    }
+
+    @Test
+    void register_negativeAge_notOk() {
+        User user = new User();
+
+        user.setAge(-3);
 
         Assertions.assertThrows(RegistrationException.class, () -> service.register(user));
         Assertions.assertNull(storageDao.get(user.getLogin()));
@@ -128,17 +210,7 @@ class RegistrationServiceImplTest {
     }
 
     @Test
-    void register_negativeAge_notOk() {
-        User user = new User();
-
-        user.setAge(-3);
-
-        Assertions.assertThrows(RegistrationException.class, () -> service.register(user));
-        Assertions.assertNull(storageDao.get(user.getLogin()));
-    }
-
-    @Test
-    void register_shouldPass_whenAgeIsExactly18() {
+    void register_ageExactly18_Ok() {
         User user = new User();
 
         user.setLogin("login345");
@@ -146,7 +218,7 @@ class RegistrationServiceImplTest {
         user.setAge(18);
 
         Assertions.assertDoesNotThrow(() -> service.register(user));
-        Assertions.assertNotNull(user.getLogin());
+        Assertions.assertNotNull(storageDao.get(user.getLogin()));
     }
 
     @Test

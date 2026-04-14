@@ -32,18 +32,21 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         if (user.getLogin().length() < MIN_LOGIN_LENGTH) {
-            throw new RegistrationException("Invalid login");
+            throw new RegistrationException("Invalid login length: " + user.getLogin().length()
+                    + ". Min allowed login length is " + MIN_LOGIN_LENGTH);
         }
         if (user.getPassword().length() < MIN_PASSWORD_LENGTH) {
-            throw new RegistrationException("Invalid password");
+            throw new RegistrationException("Invalid password length: "
+                    + user.getPassword().length() + ". Min allowed password length is "
+                    + MIN_PASSWORD_LENGTH);
         }
 
-        if (user.getAge() < MIN_AGE) {
-            throw new RegistrationException("Registration failed. Age must be over 18."
-                    + "Your age: " + user.getAge() + "Required: " + MIN_AGE + " or over");
-        }
         if (user.getAge() < MIN_POSSIBLE_AGE) {
             throw new RegistrationException("Age cannot be negative");
+        }
+        if (user.getAge() < MIN_AGE) {
+            throw new RegistrationException("Not valid age: " + user.getAge()
+                    + ". Min allowed age is " + MIN_AGE);
         }
 
         return storageDao.add(user);
